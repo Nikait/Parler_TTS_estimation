@@ -3,18 +3,16 @@ import torch
 import librosa
 
 LENGTH = 63
+TEST_DIR = "test"
 
 if __name__ == "__main__":
     # Загрузка UTMOS
     predictor = torch.hub.load("tarepan/SpeechMOS:v1.2.0", "utmos22_strong", trust_repo=True)
     
-    # Директория с аудиофайлами
-    test_dir = "test"
-    
     utmos_scores = []
     
     for i in range(LENGTH):
-        audio_file = os.path.join(test_dir, f"generated_audio_{i}.wav")
+        audio_file = os.path.join(TEST_DIR, f"generated_audio_{i}.wav")
     
         # Загрузка аудио
         wave, sr = librosa.load(audio_file, sr=None, mono=True)
