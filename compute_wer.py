@@ -8,6 +8,7 @@ from datasets import load_dataset
 from jiwer import wer
 from phonemizer.separator import Separator
 
+LENGTH = 63
 
 whisper = pipeline(
     "automatic-speech-recognition",
@@ -29,7 +30,7 @@ if __name__ == "__main__":
     
     wer_scores = []
     
-    for i in range(len(data['test'])):
+    for i in range(LENGTH):
         audio_file = f"test/generated_audio_{i}.wav"
     
         # Транскрибируем аудио используя Whisper
