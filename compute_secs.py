@@ -5,6 +5,7 @@ import librosa
 import torch.nn.functional as F
 from transformers import Wav2Vec2FeatureExtractor, WavLMForXVector
 
+LENGTH = 63
 
 feature_extractor = Wav2Vec2FeatureExtractor.from_pretrained(
     "microsoft/wavlm-base-plus-sv"
@@ -51,7 +52,7 @@ if __name__ == "__main__":
     secs_scores = []
     
     # Пройдемся по всем файлам
-    for i in range(len(data['test'])):  # Предполагаем, что количество файлов известно
+    for i in range(LENGTH):
         original_audio_file = os.path.join(test_dir, f"original_audio_{i}.wav")
         generated_audio_file = os.path.join(test_dir, f"generated_audio_{i}.wav")
         
