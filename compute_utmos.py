@@ -2,6 +2,7 @@ import os
 import torch
 import librosa
 
+LENGTH = 63
 
 if __name__ == "__main__":
     # Загрузка UTMOS
@@ -12,7 +13,7 @@ if __name__ == "__main__":
     
     utmos_scores = []
     
-    for i in range(len(data['test'])):
+    for i in range(LENGTH):
         audio_file = os.path.join(test_dir, f"generated_audio_{i}.wav")
     
         # Загрузка аудио
