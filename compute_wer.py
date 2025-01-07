@@ -6,9 +6,11 @@ import torch
 from transformers import pipeline
 from datasets import load_dataset
 from jiwer import wer
-from phonemizer.separator import Separator
+
 
 LENGTH = 63
+TEST_DIR = "test" # Директория с тестовыми аудиофайлами
+
 
 whisper = pipeline(
     "automatic-speech-recognition",
@@ -25,13 +27,11 @@ if __name__ == "__main__":
             if ": " in line:
                 file_name, text = line.strip().split(": ", 1)
                 original_texts[file_name] = text.lower()  # Приводим к нижнему регистру
-    # Директория с тестовыми аудиофайлами
-    test_dir = "test"
     
     wer_scores = []
     
     for i in range(LENGTH):
-        audio_file = f"test/generated_audio_{i}.wav"
+        audio_file = f"{TEST_DIR}/generated_audio_{i}.wav"
     
         # Транскрибируем аудио используя Whisper
         transcription = whisper(audio_file)
