@@ -6,6 +6,8 @@ import torch.nn.functional as F
 from transformers import Wav2Vec2FeatureExtractor, WavLMForXVector
 
 LENGTH = 63
+TEST_DIR = "test"
+SAMPLE_RATE = 16000
 
 feature_extractor = Wav2Vec2FeatureExtractor.from_pretrained(
     "microsoft/wavlm-base-plus-sv"
@@ -14,11 +16,11 @@ sv_model = WavLMForXVector.from_pretrained("microsoft/wavlm-base-plus-sv")
 
 
 def SECS(ref, gen):
-    spk1_wav, _ = librosa.load(ref, sr=48000)
-    spk2_wav, _ = librosa.load(gen, sr=48000)
+    spk1_wav, _ = librosa.load(ref, sr=SAMPLE_RATE)
+    spk2_wav, _ = librosa.load(gen, sr=SAMPLE_RATE)
 
     input1 = feature_extractor(
-        [spk1_wav], padding=True, return_tensors="pt", sampling_rate=48000
+        [spk1_wav], padding=True, return_tensors="pt", sampling_rate=SAMPLE_RATE
     )
     if torch.cuda.is_available():
         for key in input1.keys():
@@ -29,7 +31,7 @@ def SECS(ref, gen):
         embds_1 = embds_1[0]
 
     input2 = feature_extractor(
-        [spk2_wav], padding=True, return_tensors="pt", sampling_rate=48000
+        [spk2_wav], padding=True, return_tensors="pt", sampling_rate=SAMPLE_RATE
     )
     if torch.cuda.is_available():
         for key in input2.keys():
@@ -45,16 +47,13 @@ def SECS(ref, gen):
 
 
 if __name__ == "__main__":
-    # Директория с аудиофайлами
-    test_dir = "test"
-    
     # Список для хранения результатов SECS
     secs_scores = []
     
     # Пройдемся по всем файлам
     for i in range(LENGTH):
-        original_audio_file = os.path.join(test_dir, f"original_audio_{i}.wav")
-        generated_audio_file = os.path.join(test_dir, f"generated_audio_{i}.wav")
+        original_audio_file = os.path.join(TEST_DIR, f"original_audio_{i}.wav")
+        generated_audio_file = os.path.join(TEST_DIR, f"generated_audio_{i}.wav")
         
         # Проверка существования файлов
         if not os.path.exists(original_audio_file) or not os.path.exists(generated_audio_file):
