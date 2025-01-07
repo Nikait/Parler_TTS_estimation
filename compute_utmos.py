@@ -28,7 +28,7 @@ if __name__ == "__main__":
         print(f"File: {audio_file}")
         print(f"UTMOS: {score.item():.4f}")
         print("-" * 100)
-
-# Среднее значение UTMOS
-average_utmos = sum(utmos_scores) / len(utmos_scores)
-print(f"Average UTMOS: {average_utmos:.4f}")
+    
+    # Среднее значение UTMOS
+    average_utmos = sum(utmos_scores) / len(utmos_scores)
+    print(f"Average UTMOS: {average_utmos:.4f}")
