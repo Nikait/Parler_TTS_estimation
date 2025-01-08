@@ -1,58 +1,58 @@
-# Общий план
+# General Plan
 
-## 1. Запустим Parler-TTS на тестовом примере (пример в ноутбуке results.ipynb).
+## 1. Run Parler-TTS on a Test Example (Example in the `results.ipynb` notebook)
 
+**Note:** Initially, it is unclear which part of the dataset was used for the pretraining available on Hugging Face. Therefore, we will also compare on **LibriSpeech Test Clean** for objectivity.
 
-Note: изначально непонятно, какая часть всей выборки использовалась для претрейна, который выложен на huggingface. Поэтому также будем сравнивать на LibriSpeech test clean для объективности.
+- Split the **Jenny** dataset into training and test sets: allocate ~0.3% for the test set (resulting in 63 random audio samples from the dataset).
+- Take a small portion of the **LibriSpeech Test Clean** dataset (63 random audio samples). (All steps are done in the `results.ipynb` notebook.)
+- All calculations are performed on a single T4 GPU (hence, we use a small number of samples for benchmarks).
 
-Разделим датасет Jenny на тренировочный и тестовый наборы: выделим под тестовую часть ~0.3% (в итоге 63 случайных аудиозаписей из набора).
+## 2. What is Included in Speech Synthesis Evaluation
 
-Также возьмем небольшую часть датасета LibriSpeech test clean (63 случайных аудиозаписей). (всё проделано в ноутбуке results.ipynb)
+We need to consider the following characteristics:
 
-Все расчеты проводятся на одной T4 GPU (поэтому для бенчмарков используем немного записей).
+- **Naturalness**: How natural the synthesized speech sounds.
+- **Intelligibility**: How clearly the words are pronounced.
+- **Speaker Similarity**: How similar the synthesized voice is to the target voice.
 
-## 2. Что входит в оценку синтеза речи
+## 3. Metrics for Evaluation
 
-Нам важно учитывать характеристики:
+For each characteristic, we will use the following metrics:
 
-- Естественность (Naturalness)
+- **Naturalness**: 
+  - **MOS (Mean Opinion Score)**: A subjective score from 1 to 5, where 5 is maximum naturalness (usually evaluated by humans, which is highly subjective).
+  - **Neural MOS**: For example, [UTMOS](https://arxiv.org/abs/2204.02152). We will use this metric.
+  
+- **Intelligibility**: 
+  - **WER (Word Error Rate)**: The percentage of word recognition errors. We will use a good ASR model to transcribe the generated audio and compare it with the original transcription.
 
-- Разборчивость (Intelligibility): Насколько четко произносятся слова.
+- **Speaker Similarity**: 
+  - **Speaker Encoder Cosine Similarity (SECS)**: Using the WavLM model for embeddings, as described in [this paper](https://arxiv.org/abs/2104.05557).
 
-- Сходство голосов: насколько синтезированный голос похож на целевой.
+**Why these metrics?** They are the most objective for TTS, although there are still questions: which ASR to use for WER, which model is best for Neural MOS, etc. Due to this, there may be variations in evaluations across publications, and absolute objectivity may not be achieved.
 
-## 3. Метрики для оценки
+We could also evaluate more subjective aspects: manually or by asking a group of people to provide MOS scores, or assess how accurately the tone style in the Parler TTS prompt is conveyed. However, these methods are less precise.
 
-Для каждой характеристики будем использовать следующие метрики:
+## 4. Metric Calculations
 
-- Естественность: MOS (Mean Opinion Score) — субъективная оценка от 1 до 5, где 5 — максимальная естественность (обычно оценивается людьми, что очень субьективно). Также есть разные Neural MOS, к примеру [UTMOS](https://arxiv.org/abs/2204.02152), будем использовать его.
-- Разборчивость: WER (Word Error Rate) — процент ошибок в распознавании слов. Будем брать хороший ASR, полученное аудио транскрибировать и сравнивать с исходной транскрибацией.
+All calculation code, including the loading of both datasets, is provided in the `results.ipynb` notebook.
 
-- Сходство голосов: будем считать [Speaker Encoder Cosine Similarity - SECS](https://arxiv.org/abs/2104.05557), используя модель эмбеддингов WavLM
+Using the scripts from the repository to calculate each metric, the data must first be placed in the `./TEST_DIR` directory in the following format:
 
-Почему именно эти метрики? Они являются наиболее объективными для TTS, хотя и тут вопросы: какой ASR использовать для WER, какую именно модель для Neural MOS лучше использовать, из-за этого во многих публикациях могут быть различия в оценках и не будет объективности.
+- `original_audio_{i}.wav`
+- `generated_audio_{i}.wav`
+- `transcriptions.txt`: Transcriptions of the files, with entries in the format `generated_audio_{i}.wav: {transcription text}`
 
-Можно также было бы оценивать более субъективные вещи: вручную и/или попросить группу людей сделать оценку MOS, также насколько точно передается стиль тона в промпте Parler TTS, но это не сильно точно.
+## Results
 
+## Metric Evaluation
 
-## 4. Расчеты метрик
-
-Весь код расчета, в т.ч. загрузка обоих датасетов представлены в ноутбуке results.ipynb.
-
-Используя скрипты из репозитория для расчета каждой отдельной метрики, перед этим данные должны быть помещены в директорию ./test/ в следующем формате:
-
-- original_audio_{i}.wav
-- generated_audio_{i}.wav
-- transcriptions.txt - траскрибация файлов, записи в виде generated_audio_{i}.wav: {текст транкрибации}
-
-## Результаты
-
-## Оценка метрик
-
-| Датасет \ метрики           | WER    | UTMOS  | SECS   |
+| Dataset \ Metrics           | WER    | UTMOS  | SECS   |
 |-----------------------------|--------|--------|--------|
 | **LibriSpeech Test Clean**  | 0.4946 | 4.1036 | 0.6337 |
 | **Jenny**                   | 0.2074 | 4.1682 | 0.9356 |
 
-
-Бенчмарки на датасете **LibriSpeech Test Clean** получились хуже, что во-первых, возможно из-за того, что аудио из датасета **Jenny** использовалось для трейна, во-вторых: для генерации аудио из датасета **LibriSpeech Test Clean**, возможно, использовался не сильно релевантный промт.
+The benchmarks on the **LibriSpeech Test Clean** dataset performed worse. This could be due to:
+1. The selected examples from the **Jenny** dataset potentially being used for training.
+2. The prompt used for generating audio from the **LibriSpeech Test Clean** dataset may not have been highly relevant.
