@@ -38,6 +38,14 @@ We could also evaluate more subjective aspects: manually or by asking a group of
 
 All calculation code, including the loading of both datasets, is provided in the `results.ipynb` notebook.
 
+Requirements:
+
+```
+!pip install git+https://github.com/huggingface/parler-tts.git
+!pip install requirements.txt
+```
+
+
 Using the scripts from the repository to calculate each metric, the data must first be placed in the `./TEST_DIR` directory in the following format:
 
 - `original_audio_{i}.wav`
