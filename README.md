@@ -41,8 +41,8 @@ All calculation code, including the loading of both datasets, is provided in the
 Requirements:
 
 ```
-!pip install git+https://github.com/huggingface/parler-tts.git
-!pip install requirements.txt
+pip install git+https://github.com/huggingface/parler-tts.git
+pip install requirements.txt
 ```
 
 
